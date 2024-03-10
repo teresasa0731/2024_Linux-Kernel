@@ -1,50 +1,64 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
 
-#include "qlist.h"
+#include "list.h"
 #include "qsort.h"
+#include "stack.h"
 
-void quick_sort(node_t **list)
+long int quick_sort(struct list_head **head)
 {
-    int n = list_length(list);
-    int value;
+    clock_t time = clock();
+
+    if (!(*head) || list_empty(*head))
+        return clock() - time;
+
+    int n = list_length(*head);
     int i = 0;
     int max_level = 2 * n;
-    node_t *begin[max_level], *end[max_level];
-    node_t *result = NULL, *left = NULL, *right = NULL;
+    struct list_head *begin[max_level];
+    for (int i = 1; i < max_level; i++)
+        begin[i] = list_new();
+    struct list_head *result = list_new();
+    struct list_head *left = list_new(), *right = list_new();
     
-    begin[0] = *list;
-    end[0] = list_tail(list);
+    begin[0] = *head;
             
     while (i >= 0) {
-        node_t *L = begin[i], *R = end[i];
+        struct list_head *L = begin[i]->next, *R = begin[i]->prev;
         if (L != R) {
-            node_t *pivot = L;
-            value = pivot->value;
-            node_t *p = pivot->next;
-            pivot->next = NULL;
+            node_t *pivot = list_remove_head(begin[i]);
     
-            while (p) {
-                node_t *n = p;
-                p = p->next;    //CCCC
-                list_add(n->value > value ? &right : &left, n);
+            node_t *entry, *safe;
+            list_for_each_entry_safe (entry, safe, begin[i], list) {
+                list_del(&entry->list);
+                if (entry->value > pivot->value) {
+                    list_add(&entry->list, right);
+                } else {
+                    list_add(&entry->list, left);
+                }
             }
 
-            begin[i] = left;
-            end[i] = list_tail(&left);   //DDDD
-            begin[i + 1] = pivot;
-            end[i + 1] = pivot;
-            begin[i + 2] = right;
-            end[i + 2] = list_tail(&right);   //EEEE
+            list_splice_init(left, begin[i]);
+            list_add(&pivot->list, begin[i + 1]);
+            list_splice_init(right, begin[i + 2]);
 
-            left = right = NULL;
             i += 2;
         } else {
-            if (L)
-                list_add(&result, L);
+            if (list_is_singular(begin[i]))
+                list_splice_init(begin[i], result);
             i--;
         }
     }
-    *list = result;
+
+    for (int i = 0; i < max_level; i++)
+        list_free(begin[i]);
+    list_free(left);
+    list_free(right);
+
+    *head = result;
+
+    time = clock() - time;
+    return time;
 }

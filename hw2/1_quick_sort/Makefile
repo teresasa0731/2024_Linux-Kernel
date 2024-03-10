@@ -1,11 +1,14 @@
 CC = gcc
 CFLAGS = -O1 -g -Wall
 
-CFILES := qsort.c qlist.c check.c
+CFILES := qsort.c stack.c check.c
+TFILES := qsort.c stack.c test.c
 
 check: $(CFILES)
 	$(CC) $^ -o $@ $(CFLAGS)
 
+test: $(TFILES)
+	$(CC) $^ -o $@ $(CFLAGS)
+
 clean:
-	rm -f $(CFILES)
-	rm -f *.dSYM
+	rm -f check test

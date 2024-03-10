@@ -4,24 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "qlist.h"
+#include "list.h"
 #include "qsort.h"
+#include "stack.h"
 
 /* Verify if list is order */
-static bool list_is_ordered(node_t *list)
+static bool list_is_ordered(struct list_head *head)
 {
-    bool first = true;
-    int value;
-    while (list) {
-        if (first) {
-            value = list->value;
-            first = false;
-        } else {
-            if (list->value < value)
-                return false;
-            value = list->value;
+    if (!head || list_empty(head))
+        return true;
+
+    struct list_head *cur;
+    list_for_each (cur, head) {
+        if (cur->next == head)
+            break;
+        node_t *a = list_entry(cur, node_t, list);
+        node_t *b = list_entry(cur->next, node_t, list);
+        if (a->value > b->value) {
+            printf("%ld, %ld\n", a->value, b->value);
+            return false;
         }
-        list = list->next;
     }
     return true;
 }
@@ -40,18 +42,17 @@ void shuffle(int *array, size_t n)
     }
 }
 
-void show(node_t *head)
+void show(struct list_head *head)
 {
-    while (head) {
-        printf("%ld ", head->value);
-        head = head->next;
-    }
+    node_t *cur;
+    list_for_each_entry (cur, head, list)
+        printf("%ld ", cur->value);
     printf("\n");
 }
 
 int main(int argc, char **argv)
 {
-    node_t *list = NULL;
+    struct list_head *list = list_new();
 
     size_t count = 100000;
 
@@ -62,15 +63,17 @@ int main(int argc, char **argv)
     shuffle(test_arr, count);
 
     while (count--)
-        list = list_construct(list, test_arr[count]);
+        list_insert_head(list, test_arr[count]);
 
-    quick_sort(&list);
+    long int time = quick_sort(&list);
     assert(list_is_ordered(list));
     show(list);
 
-    list_free(&list);
+    list_free(list);
 
     free(test_arr);
+
+    printf("quick sort time [original]: %ld",time); // quick sort time [original]: 36316
 
     return 0;
 }
