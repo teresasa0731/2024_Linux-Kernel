@@ -3,10 +3,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "list.h"
 #include "qsort.h"
 #include "stack.h"
+
+
 
 /* Verify if list is order */
 static bool list_is_ordered(struct list_head *head)
@@ -52,28 +55,29 @@ void show(struct list_head *head)
 
 int main(int argc, char **argv)
 {
-    struct list_head *list = list_new();
+    for(size_t cnt = 10; cnt <= 100000; cnt*=10){
+        struct list_head *list = list_new();
 
-    size_t count = 100000;
+        size_t count = cnt;
 
-    int *test_arr = malloc(sizeof(int) * count);
+        int *test_arr = malloc(sizeof(int) * count);
 
-    for (int i = 0; i < count; ++i)
-        test_arr[i] = i;
-    shuffle(test_arr, count);
+        for (int i = 0; i < count; ++i)
+            test_arr[i] = i;
+        shuffle(test_arr, count);
 
-    while (count--)
-        list_insert_head(list, test_arr[count]);
+        while (count--)
+            list_insert_head(list, test_arr[count]);
 
-    long int time = quick_sort(&list);
-    assert(list_is_ordered(list));
-    show(list);
+        long int max_level = quick_sort(&list);
+        assert(list_is_ordered(list));
+        // show(list);
 
-    list_free(list);
+        list_free(list);
 
-    free(test_arr);
+        free(test_arr);
 
-    printf("quick sort time [original]: %ld",time); // quick sort time [original]: 36316
-
+        printf("size = %ld\tmax level %ld\n", cnt, max_level);
+    }
     return 0;
 }

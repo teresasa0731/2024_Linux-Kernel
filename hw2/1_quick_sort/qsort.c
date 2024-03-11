@@ -1,11 +1,22 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include "list.h"
 #include "qsort.h"
 #include "stack.h"
+
+int count(int size) {
+    int cnt = 0;
+    while (size != 0)
+    {
+        cnt++;
+        size /= 10;
+    }
+    return cnt * 10;
+}
 
 long int quick_sort(struct list_head **head)
 {
@@ -16,20 +27,21 @@ long int quick_sort(struct list_head **head)
 
     int n = list_length(*head);
     int i = 0;
-    int max_level = 2 * n;
+    int max_level = count(n);
+    int max = 0;    // max_level test
     struct list_head *begin[max_level];
     for (int i = 1; i < max_level; i++)
         begin[i] = list_new();
     struct list_head *result = list_new();
     struct list_head *left = list_new(), *right = list_new();
-    
+
     begin[0] = *head;
-            
+
     while (i >= 0) {
         struct list_head *L = begin[i]->next, *R = begin[i]->prev;
         if (L != R) {
             node_t *pivot = list_remove_head(begin[i]);
-    
+
             node_t *entry, *safe;
             list_for_each_entry_safe (entry, safe, begin[i], list) {
                 list_del(&entry->list);
@@ -45,6 +57,7 @@ long int quick_sort(struct list_head **head)
             list_splice_init(right, begin[i + 2]);
 
             i += 2;
+            max = i > max ? i : max;
         } else {
             if (list_is_singular(begin[i]))
                 list_splice_init(begin[i], result);
@@ -60,5 +73,6 @@ long int quick_sort(struct list_head **head)
     *head = result;
 
     time = clock() - time;
-    return time;
+
+    return max;
 }
