@@ -25,13 +25,13 @@ static struct list_head *merge(void *priv,
                                struct list_head *b)
 {
     struct list_head *head;
-    struct list_head **tail = &head;    //AAAA;
+    struct list_head **tail = &head;  // AAAA;
 
     for (;;) {
         /* if equal, take 'a' -- important for sort stability */
         if (cmp(priv, a, b) <= 0) {
             *tail = a;
-            tail = &a->next;    //BBBB;
+            tail = &a->next;  // BBBB;
             a = a->next;
             if (!a) {
                 *tail = b;
@@ -39,7 +39,7 @@ static struct list_head *merge(void *priv,
             }
         } else {
             *tail = b;
-            tail = &b->next;    //CCCC;
+            tail = &b->next;  // CCCC;
             b = b->next;
             if (!b) {
                 *tail = a;
@@ -62,8 +62,8 @@ static void build_prev_link(struct list_head *head,
     } while (list);
 
     /* The final links to make a circular doubly-linked list */
-    tail->next = head;  //DDDD
-    head->prev = tail;        //EEEE
+    tail->next = head;  // DDDD
+    head->prev = tail;  // EEEE
 }
 
 static void merge_final(void *priv,
@@ -218,7 +218,7 @@ void timsort(void *priv, struct list_head *head, list_cmp_func_t cmp)
     struct list_head *stk0 = tp, *stk1 = stk0->prev;
     while (stk1 && stk1->prev)
         stk0 = stk0->prev, stk1 = stk1->prev;
-    if (stk_size <= 1) {    //FFFF
+    if (stk_size <= 1) {  // FFFF
         build_prev_link(head, head, stk0);
         return;
     }
