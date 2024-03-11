@@ -1,22 +1,53 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
 
 #include "list.h"
 #include "qsort.h"
 #include "stack.h"
 
-int count(int size) {
+int count(int size)
+{
     int cnt = 0;
-    while (size != 0)
-    {
+    while (size != 0) {
         cnt++;
         size /= 10;
     }
     return cnt * 10;
 }
+
+
+static inline void list_swap(struct list_head *entry1, struct list_head *entry2)
+{
+    struct list_head *pos = entry2->prev;
+
+    list_del(entry2);
+    entry2->next = entry1->next;
+    entry2->next->prev = entry2;
+    entry2->prev = entry1->prev;
+    entry2->prev->next = entry2;
+    if (pos == entry1)
+        pos = entry2;
+    list_add(entry1, pos);
+}
+
+void random_pivot(struct list_head *head)
+{
+    if (!head || list_is_singular(head))
+        return;
+    int r = rand() % list_length(head);
+    struct list_head *pick;
+    list_for_each (pick, head) {
+        if (r == 0)
+            break;
+        r--;
+    }
+    if (head->next != pick)
+        list_swap(head->next, pick);
+}
+
 
 long int quick_sort(struct list_head **head)
 {
@@ -27,8 +58,9 @@ long int quick_sort(struct list_head **head)
 
     int n = list_length(*head);
     int i = 0;
-    int max_level = count(n);
-    int max = 0;    // max_level test
+    // int max_level = count(n);
+    int max_level = 2 * n;
+    int max = 0;  // max_level test
     struct list_head *begin[max_level];
     for (int i = 1; i < max_level; i++)
         begin[i] = list_new();
@@ -40,6 +72,7 @@ long int quick_sort(struct list_head **head)
     while (i >= 0) {
         struct list_head *L = begin[i]->next, *R = begin[i]->prev;
         if (L != R) {
+            random_pivot(begin[i]);
             node_t *pivot = list_remove_head(begin[i]);
 
             node_t *entry, *safe;
@@ -74,5 +107,7 @@ long int quick_sort(struct list_head **head)
 
     time = clock() - time;
 
-    return max;
+    printf("max level = %d\t", max);
+
+    return time;
 }
