@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "list.h"
 #include "qsort.h"
@@ -55,7 +54,7 @@ void show(struct list_head *head)
 
 int main(int argc, char **argv)
 {
-    for(size_t cnt = 10; cnt <= 100000; cnt*=10){
+    for (size_t cnt = 10; cnt <= 100000; cnt *= 10) {
         struct list_head *list = list_new();
 
         size_t count = cnt;
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
         while (count--)
             list_insert_head(list, test_arr[count]);
 
-        long int max_level = quick_sort(&list);
+        long int time = quick_sort(&list);
         assert(list_is_ordered(list));
         // show(list);
 
@@ -77,7 +76,7 @@ int main(int argc, char **argv)
 
         free(test_arr);
 
-        printf("size = %ld\tmax level %ld\n", cnt, max_level);
+        printf("size = %ld\tquick sort time %ld\n", cnt, time);
     }
     return 0;
 }

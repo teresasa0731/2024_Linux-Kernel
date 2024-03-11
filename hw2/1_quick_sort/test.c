@@ -4,26 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "qlist.h"
+#include "list.h"
 #include "qsort.h"
-
-int test_cnt = 10000;
+#include "stack.h"
 
 /* Verify if list is order */
-static bool list_is_ordered(node_t *list)
+static bool list_is_ordered(struct list_head *head)
 {
-    bool first = true;
-    int value;
-    while (list) {
-        if (first) {
-            value = list->value;
-            first = false;
-        } else {
-            if (list->value < value)
-                return false;
-            value = list->value;
+    if (!head || list_empty(head))
+        return true;
+
+    struct list_head *cur;
+    list_for_each (cur, head) {
+        if (cur->next == head)
+            break;
+        node_t *a = list_entry(cur, node_t, list);
+        node_t *b = list_entry(cur->next, node_t, list);
+        if (a->value > b->value) {
+            printf("%ld, %ld\n", a->value, b->value);
+            return false;
         }
-        list = list->next;
     }
     return true;
 }
@@ -42,67 +42,64 @@ void shuffle(int *array, size_t n)
     }
 }
 
-void show(node_t *head)
-{
-    while (head) {
-        printf("%ld ", head->value);
-        head = head->next;
-    }
-    printf("\n");
-}
 
-long int test_avg(long int *arr){
-    long long int avg = 0;
-    for(int i = 0; i < test_cnt; i++)
-        avg += arr[i];
-    return avg / test_cnt;   
+void show(struct list_head *head)
+{
+    node_t *cur;
+    list_for_each_entry (cur, head, list)
+        printf("%ld ", cur->value);
+    printf("\n");
 }
 
 int main(int argc, char **argv)
 {
-    node_t *list = NULL;
-    size_t count = 10000;
+    size_t count = 100000;
 
     long int time = 0;
 
-    // avg case
-    for (size_t j = 0; j < count/2; ++j)
-        list = list_construct(list, j);
+    // // avg case
+    struct list_head *list = list_new();
 
-    for (size_t j = count-1 ; j >= count/2; --j)
-        list = list_construct(list, j);
+    for (int j = 0; j < count / 2; ++j)
+        list_insert_head(list, j);
 
-    time = quick_sort(&list);
-    assert(list_is_ordered(list));
+    for (int j = count - 1; j >= count / 2; --j)
+        list_insert_head(list, j);
 
-    list_free(&list);
-
-    printf("quick sort time (avg.  case): %ld\n",time);
-
-    // worst case
-
-    for (size_t j = 0; j < count; ++j)
-        list = list_construct(list, j);
 
     time = quick_sort(&list);
     assert(list_is_ordered(list));
 
-    list_free(&list);
+    list_free(list);
 
-    printf("quick sort time (worst case): %ld\n",time);
+    printf("quick sort time (avg.  case): %ld\n", time);
 
     // best case
+    list = list_new();
+
+    for (int j = 0; j < count; ++j)
+        list_insert_head(list, j);
+
+    quick_sort(&list);
+    assert(list_is_ordered(list));
+
+    list_free(list);
+
+    printf("quick sort time (worst case): %ld\n", time);
+
+    // worst case
+    list = list_new();
 
     for (size_t j = count; j > 0; --j)
-        list = list_construct(list, j);
+        list_insert_head(list, j);
 
     time = quick_sort(&list);
     assert(list_is_ordered(list));
 
-    list_free(&list);
+    list_free(list);
 
-    printf("quick sort time (best  case): %ld\n",time);
-    
+    printf("quick sort time (best  case): %ld\n", time);
+
 
     return 0;
 }
