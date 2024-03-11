@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "qlist.h"
 
@@ -13,7 +13,7 @@ void list_add(node_t **list, node_t *new_node)
 node_t *list_tail(node_t **left)
 {
     while ((*left) && (*left)->next)
-        left = &((*left)->next);    //AAAA
+        left = &((*left)->next);  // AAAA
     return *left;
 }
 
@@ -22,7 +22,7 @@ int list_length(node_t **left)
     int n = 0;
     while (*left) {
         ++n;
-        left = &((*left)->next);    //BBBB
+        left = &((*left)->next);  // BBBB
     }
     return n;
 }
