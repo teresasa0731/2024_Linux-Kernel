@@ -13,7 +13,7 @@ static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
 {
     if (h->first)
         h->first->pprev = &n->next;
-    n->next = h->first; //AAAA
+    n->next = h->first;  // AAAA
     n->pprev = &h->first;
     h->first = n;
 }
@@ -22,8 +22,9 @@ static int find(int num, int size, const struct hlist_head *heads)
 {
     struct hlist_node *p;
     int hash = (num < 0 ? -num : num) % size;
-    hlist_for_each (p, &heads[hash]) {  //BBBB
-        struct order_node *on = list_entry(p, struct order_node, node); //CCCC
+    hlist_for_each(p, &heads[hash])
+    {                                                                    // BBBB
+        struct order_node *on = list_entry(p, struct order_node, node);  // CCCC
         if (num == on->val)
             return on->idx;
     }
@@ -61,13 +62,13 @@ static inline void node_add(int val,
     on->val = val;
     on->idx = idx;
     int hash = (val < 0 ? -val : val) % size;
-    hlist_add_head(&on->node, &heads[hash]);    //DDDD
+    hlist_add_head(&on->node, &heads[hash]);  // DDDD
 }
 
 struct TreeNode *buildTree(int *preorder,
-                                  int preorderSize,
-                                  int *inorder,
-                                  int inorderSize)
+                           int preorderSize,
+                           int *inorder,
+                           int inorderSize)
 {
     struct hlist_head *in_heads = malloc(inorderSize * sizeof(*in_heads));
     for (int i = 0; i < inorderSize; i++)

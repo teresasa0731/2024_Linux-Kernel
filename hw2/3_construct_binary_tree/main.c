@@ -55,7 +55,8 @@ bool compareTree(int *preorder,
                  int size)
 {
     for (int i = 0; i < size; i++)
-        if (preorder[i] != result_preorder[i] || inorder[i] != result_inorder[i])
+        if (preorder[i] != result_preorder[i] ||
+            inorder[i] != result_inorder[i])
             return false;
     return true;
 }
@@ -71,7 +72,6 @@ void freeTree(struct TreeNode *root)
 
 
 
-
 int main(void)
 {
     srand(time(NULL));
@@ -82,7 +82,7 @@ int main(void)
     /* Generate a random binary tree as test case */
     struct TreeNode *root = generateTree(height, &nodeNum);
 
-    printf("tree height = %d, tree nodes = %d\n",height,nodeNum);
+    printf("tree height = %d, tree nodes = %d\n", height, nodeNum);
 
     int *preorder = malloc((nodeNum) * sizeof(int));
     int *inorder = malloc((nodeNum) * sizeof(int));
@@ -94,7 +94,8 @@ int main(void)
 
     /* Try to reconstruct binary tree */
     clock_t time = clock();
-    struct TreeNode *result_root = buildTree(preorder, nodeNum, inorder, nodeNum);
+    struct TreeNode *result_root =
+        buildTree(preorder, nodeNum, inorder, nodeNum);
     time = clock() - time;
     printf("Reconstruct time : %ld\n", time);
 
@@ -109,7 +110,8 @@ int main(void)
     preorderTraversal(result_root, result_preorder, &preIndex);
     inorderTraversal(result_root, result_inorder, &inIndex);
 
-    if(compareTree(preorder, result_preorder, inorder, result_inorder, nodeNum))
+    if (compareTree(preorder, result_preorder, inorder, result_inorder,
+                    nodeNum))
         printf("successfully rebuilt\n");
     else
         printf("rebuild failed\n");

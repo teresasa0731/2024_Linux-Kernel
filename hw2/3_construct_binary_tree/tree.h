@@ -28,6 +28,6 @@ struct order_node {
 };
 
 struct TreeNode *buildTree(int *preorder,
-                                  int preorderSize,
-                                  int *inorder,
-                                  int inorderSize);
+                           int preorderSize,
+                           int *inorder,
+                           int inorderSize);
