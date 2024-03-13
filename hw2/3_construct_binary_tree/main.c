@@ -20,8 +20,7 @@ struct TreeNode *generateTree(int height, int *nodeNum)
     if (height <= 0 || (rand() % 2 == 0 && *nodeNum))
         return NULL;
 
-    struct TreeNode *root = createTreeNode(rand() % 100);
-    (*nodeNum) += 1;
+    struct TreeNode *root = createTreeNode((*nodeNum)++);
 
     root->left = generateTree(height - 1, nodeNum);
     root->right = generateTree(height - 1, nodeNum);
@@ -99,7 +98,13 @@ int main(void)
     postorderTraversal(root, postorder, &postIndex);
 
     printf("tree height = %d, tree nodes = %d\n", height, nodeNum);
-
+    // printf("preorder: ");
+    // for(int i = 0; i < nodeNum; i++)
+    //     printf("%d ",preorder[i]);
+    // printf("\ninorder:  ");
+    // for(int i = 0; i < nodeNum; i++)
+    //     printf("%d ",inorder[i]);
+    // printf("\n");
 
     /* Try to reconstruct binary tree */
     clock_t time = clock();
