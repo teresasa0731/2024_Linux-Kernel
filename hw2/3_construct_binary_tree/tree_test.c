@@ -11,7 +11,7 @@ struct StackNode {
     int in_high;
 };
 
-struct TreeNode *buildTree(int *preorder,
+struct TreeNode *buildTree_test(int *preorder,
                            int preorderSize,
                            int *inorder,
                            int inorderSize)

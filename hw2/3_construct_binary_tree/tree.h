@@ -31,3 +31,10 @@ struct TreeNode *buildTree(int *preorder,
                            int preorderSize,
                            int *inorder,
                            int inorderSize);
+
+struct TreeNode *buildTree_test(int *preorder,
+                           int preorderSize,
+                           int *inorder,
+                           int inorderSize);
+
+                           
