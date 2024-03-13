@@ -17,10 +17,10 @@ struct TreeNode *createTreeNode(int data)
 
 struct TreeNode *generateTree(int height, int *nodeNum)
 {
-    if (height <= 0 || rand() % 2 == 0)
+    if (height <= 0 || (rand() % 2 == 0 && *nodeNum))
         return NULL;
 
-    struct TreeNode *root = createTreeNode(rand() % height);
+    struct TreeNode *root = createTreeNode(rand() % 100);
     (*nodeNum) += 1;
 
     root->left = generateTree(height - 1, nodeNum);
@@ -48,15 +48,20 @@ void inorderTraversal(struct TreeNode *root, int *result, int *index)
     inorderTraversal(root->right, result, index);
 }
 
-bool compareTree(int *preorder,
-                 int *result_preorder,
-                 int *inorder,
-                 int *result_inorder,
-                 int size)
+void postorderTraversal(struct TreeNode *root, int *result, int *index)
+{
+    if (!root)
+        return;
+
+    postorderTraversal(root->left, result, index);
+    postorderTraversal(root->right, result, index);
+    result[(*index)++] = root->val;
+}
+
+bool compareTree(int *postorder, int *result_postorder, int size)
 {
     for (int i = 0; i < size; i++)
-        if (preorder[i] != result_preorder[i] ||
-            inorder[i] != result_inorder[i])
+        if (postorder[i] != result_postorder[i])
             return false;
     return true;
 }
@@ -76,48 +81,52 @@ int main(void)
 {
     srand(time(NULL));
 
-    int height = 100;
+    int height = 5;
     int nodeNum = 0;
 
     /* Generate a random binary tree as test case */
     struct TreeNode *root = generateTree(height, &nodeNum);
 
-    printf("tree height = %d, tree nodes = %d\n", height, nodeNum);
 
     int *preorder = malloc((nodeNum) * sizeof(int));
     int *inorder = malloc((nodeNum) * sizeof(int));
+    int *postorder = malloc((nodeNum) * sizeof(int));
 
-    int preIndex = 0, inIndex = 0;
+    int preIndex = 0, inIndex = 0, postIndex = 0;
 
     preorderTraversal(root, preorder, &preIndex);
     inorderTraversal(root, inorder, &inIndex);
+    postorderTraversal(root, postorder, &postIndex);
+
+    printf("tree height = %d, tree nodes = %d\n", height, nodeNum);
+
 
     /* Try to reconstruct binary tree */
     clock_t time = clock();
     struct TreeNode *result_root =
         buildTree(preorder, nodeNum, inorder, nodeNum);
     time = clock() - time;
+    if (!root)
+        printf("Fail building a tree.\n");
     printf("Reconstruct time : %ld\n", time);
+
+    free(preorder);
+    free(inorder);
 
 
     /* Test the result correctness */
-    int *result_preorder = malloc((nodeNum) * sizeof(int));
-    int *result_inorder = malloc((nodeNum) * sizeof(int));
+    int *result_postorder = malloc((nodeNum) * sizeof(int));
+    postIndex = 0;
 
-    preIndex = 0;
-    inIndex = 0;
+    postorderTraversal(result_root, result_postorder, &postIndex);
 
-    preorderTraversal(result_root, result_preorder, &preIndex);
-    inorderTraversal(result_root, result_inorder, &inIndex);
-
-    if (compareTree(preorder, result_preorder, inorder, result_inorder,
-                    nodeNum))
+    if (compareTree(postorder, result_postorder, nodeNum))
         printf("successfully rebuilt\n");
     else
         printf("rebuild failed\n");
 
-    free(preorder);
-    free(inorder);
+    free(postorder);
+    free(result_postorder);
 
     freeTree(root);
     freeTree(result_root);

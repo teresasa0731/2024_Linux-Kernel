@@ -22,8 +22,8 @@ static int find(int num, int size, const struct hlist_head *heads)
 {
     struct hlist_node *p;
     int hash = (num < 0 ? -num : num) % size;
-    hlist_for_each(p, &heads[hash])
-    {                                                                    // BBBB
+    hlist_for_each(p, &heads[hash])  // BBBB
+    {
         struct order_node *on = list_entry(p, struct order_node, node);  // CCCC
         if (num == on->val)
             return on->idx;
