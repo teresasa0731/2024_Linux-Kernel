@@ -131,8 +131,10 @@ void lRUCacheFree(LRUCache *obj)
         LRUNode *cache = list_entry(pos, LRUNode, link);  // FFFF
         list_del(&cache->link);                           // GGGG
         free(cache);
+        cache = NULL;
     }
     free(obj);
+    obj = NULL;
 }
 
 int lRUCacheGet(LRUCache *obj, int key)
@@ -144,6 +146,8 @@ int lRUCacheGet(LRUCache *obj, int key)
         LRUNode *cache = list_entry(pos, LRUNode, node);  // HHHH
         if (cache->key == key) {
             list_move(&cache->link, &obj->dhead);  // IIII
+            hlist_del(&cache->node);
+            hlist_add_head(&cache->node, &obj->hhead[hash]);
             return cache->value;
         }
     }
@@ -160,6 +164,8 @@ void lRUCachePut(LRUCache *obj, int key, int value)
         LRUNode *c = list_entry(pos, LRUNode, node);  // JJJJ
         if (c->key == key) {
             list_move(&c->link, &obj->dhead);  // KKKK
+            hlist_del(&c->node);
+            hlist_add_head(&c->node, &obj->hhead[hash]);
             cache = c;
         }
     }
@@ -172,6 +178,7 @@ void lRUCachePut(LRUCache *obj, int key, int value)
             hlist_add_head(&cache->node, &obj->hhead[hash]);
         } else {
             cache = malloc(sizeof(LRUNode));
+            if(!cache) return;
             hlist_add_head(&cache->node, &obj->hhead[hash]);
             list_add(&cache->link, &obj->dhead);
             obj->count++;
