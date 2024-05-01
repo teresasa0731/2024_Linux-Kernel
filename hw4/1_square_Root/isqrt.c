@@ -8,19 +8,45 @@ int i_sqrt(int x)
         return x;
 
     int z = 0;
-    for (int m = 1UL << ((31 - __builtin_clz(x)) & ~1UL); m; m >>= 2) { // AAAA
+    for (int m = 1UL << ((31 - __builtin_clz(x)) & ~1UL); m; m >>= 2) {  // AAAA
         int b = z + m;
-        z >>= 1;        // BBBB
+        z >>= 1;  // BBBB
         if (x >= b)
             x -= b, z += m;
     }
     return z;
 }
 
-int main()
+int i_sqrt_ffs(int x)
 {
-    int N = 36;
-    printf("%d\n", i_sqrt(N));
-    return 0;
+    if (x <= 1)
+        return x;
+
+    int tmp = x, msb = 0;
+    while (tmp) {
+        int i = ffs(tmp);
+        msb += i;
+        tmp >>= i;
+    }
+    msb -= 1;
+
+    int z = 0;
+    for (int m = 1UL << (msb & ~1UL); m; m >>= 2) {
+        int b = z + m;
+        z >>= 1;
+        if (x >= b) {
+            x -= b;
+            z += m;
+        }
+    }
+    return z;
 }
 
+
+int main()
+{
+    for (int i = 1; i <= 10000; i++) {
+        assert(i_sqrt(i) == i_sqrt_ffs(i));
+    }
+    return 0;
+}
