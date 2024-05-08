@@ -4,7 +4,7 @@ int ceil_ilog2(uint32_t x)
 {
     uint32_t r, shift;
 
-    x--;
+    x -= !!x;
     r = (x > 0xFFFF) << 4;                                                                                                                                    
     x >>= r;
     shift = (x > 0xFF) << 3;
